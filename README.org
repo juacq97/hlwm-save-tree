@@ -1,0 +1,26 @@
+#+title: hlwm-save-tree
+
+ If you have used the i3 window manager before, maybe you have used the ~i3-save-tree~ feature. This feature allows the user to save a JSON representation of the splits and open windows, so that it can be restored later, both splits and windows locations. The cool thing about this is that if some windows aren't open when the layout is loaded, a placeholder is created and the window is "swallowed" once it appears on screen. Herbstluftwm has a similar feature called `dump` which prints a representation of the splits and windows on the selected tag. This feature has a big drawback compared to i3: it saves an hexagesimal ID for each window instead of classes or instances. This ID changes every session, so saving it as a layout is useless once you reboot the machine.
+
+ This script tries to solve this problem and adds a cool way to load your layouts using dmenu.  First it creates a file with the contents of the `herbstclient dump` command, this is useful to recreate the splits. Then it creates one-shot rules (rules that are applied only the first time the window is opened), so the frame where the windows were when the layout was created is saved. Finally it executes this one-shot rules, this mimics i3's "swallow" feature.
+
+* Dependencies
++ dmenu
++ herbstluftwm
++ bash
++ coreutils
+ 
+* Usage
+
+Put the script anywhere on your =$PATH= (=/usr/local/bin= for example) and run it. The available commands are:
+
++ ~hlwm-save-tree save~: Asks for a name using ~dmenu~, then creates a script at $dir (by default =~/.config/herbstluftwm/layouts=) with the desired name
++ ~hlwm-save-tree load~: It shows a list of saved layouts using ~dmenu~, once one is selected, it recreates the layout.
+
+  I recommend you to set some keybindings to save and load the layouts. You can change ~dir~  for whatever path you want.
+
+* Considerations
+
++ Right now, the script saves the layout for all the tags
++ Some windows set the =instance=, =class= or =title= late in the lauch, because of this they're not swallowed. Examples of this are ~thunar~ (the title is set later than the class) and spotify. You can always edit the layout and change the =class= or remove the =title= if needed.
++ The script saves the =title=. This is important because the title tends to change very often, for example, =firefox= sets the =title= as the name of the webpage you're watching; other windows set the =title= as the name of the file you're visiting. If you want to swallow or move the windows independently of their =title= you can delete the ~title=<title>~  part of the generated layout.
